@@ -1,49 +1,62 @@
-use actix_web::{
-    web, App, HttpServer, HttpResponse, Error, error, dev, http,
-    middleware::{
-        ErrorHandlers,
-        ErrorHandlerResponse,
-    },
-};
-use actix_files::NamedFile;
-use tera::Tera;
+use std::collections::HashMap;
 
-async fn index(tmpl: web::Data<Tera>) -> Result<HttpResponse, Error> {
-    let mut ctx = tera::Context::new();
-    ctx.insert("name", "sh_muso");
+use actix_web::{middleware, web, App, HttpResponse, HttpServer, Result};
+use askama::Template;
 
-    let view =
-        tmpl.render("index.html.tera", &ctx)
-            .map_err(|e| error::ErrorInternalServerError(e))?;
+#[derive(Template)]
+#[template(path = "user.html")]
+struct UserTemplate<'a> {
+    name: &'a str,
+    text: &'a str,
+    title: &'a str,
+}
+
+#[derive(Template)]
+#[template(path = "index.html")]
+struct Index;
+
+async fn index(query: web::Query<HashMap<String, String>>) -> Result<HttpResponse> {
+    let s = if let Some(name) = query.get("name") {
+        UserTemplate {
+            name,
+            text: "Welcome!",
+            title: "test app",
+        }
+        .render()
+        .unwrap()
+    } else {
+        Index.render().unwrap()
+    };
     
-    Ok(HttpResponse::Ok().content_type("text/html").body(view))
+    Ok(HttpResponse::Ok().content_type("text/html").body(s))
 }
 
-fn not_found<B>(res: dev::ServiceResponse<B>) -> actix_web::Result<ErrorHandlerResponse<B>> {
-    let new_resp = NamedFile::open("static/errors/404.html")?
-        .set_status_code(res.status())
-        .into_response(res.request());
-        
-    Ok(ErrorHandlerResponse::Response(
-        res.into_response(new_resp.into_body()),
-    ))
-}
+/*
+#[derive(Template)]
+#[template(path = "home.html")]
+struct Home;
 
-#[actix_rt::main]
+async fn home(username: web::Query) -> std::io::Result<()> {
+    let h = username.get(name)
+    match h {
+
+    }
+}
+*/
+
+#[actix_web::main]
 async fn main() -> std::io::Result<()> {
-    HttpServer::new( || {
-        let error_handlers = ErrorHandlers::new()
-            .handler(http::StatusCode::NOT_FOUND, not_found);
-
-        let templates = Tera::new("templates/**/*").unwrap();
-
+    std::env::set_var("RUST_LOG", "actix_web=info");
+    env_logger::init();
+  
+    // start http server
+    HttpServer::new(move || {
         App::new()
-            .app_data(web::Data::new(templates))
-            .wrap(error_handlers)
-            .service(web::resource("/").to(index))
+            .wrap(middleware::Logger::default())
+            .service(web::resource("/").route(web::get().to(index)))
+            //.service(web::resource("/home").route(web::get().to(        )))
     })
-        .bind("localhost:3000")
-        .expect("Can not bind to port 3000")
-        .run()
-        .await
+    .bind(("127.0.0.1", 8080))?
+    .run()
+    .await
 }

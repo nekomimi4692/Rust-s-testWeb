@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title>test app</title>
+
+        <style>
+            body 
+            {
+                margin: 0;
+                background-color: #ffe6bf;
+                font-family: arial;
+                text-align: center;
+                width: 40%;
+                margin: 20% auto;
+                display: block;
+            
+                box-sizing: border-box;
+                
+                border-top-left-radius: 34% 40%;
+                border-bottom-left-radius: 39% 81%;
+                border-top-right-radius: 66% 29%;
+                border-bottom-right-radius: 63% 37%;
+            }
+            h1, h3, form
+            {
+                color:black;
+            }
+            .ok
+            {
+                left: 10%;
+            }
+
+            
+            /* Positioning */
+            .body 
+            {
+                z-index: 1;
+                position: relative;
+            }
+            div 
+            {
+                position: absolute;
+            }
+            div 
+            {
+                left: 32%;
+                mix-blend-mode: multiply;
+                margin: -15% 10%;
+                border: 4px solid black;
+            }
+
+            /* Circles */
+            .circle-1 
+            {
+                width: 280px;
+                height: 300px;
+                background: #f66;
+                border-radius: 50% 50% 50% 70%/50% 50% 70% 60%;
+                animation: border-animation 6s infinite linear;
+            }
+            .circle-2 
+            {
+                width: 290px;
+                height: 310px;
+                background: #f92;
+                border-radius: 80% 30% 50% 50%/50%;
+                animation: border-animation 4s infinite linear;
+            }
+            .circle-3 
+            {
+                width: 300px;
+                height: 320px;
+                background: #fc2;
+                border-radius: 40% 40% 50% 40%/30% 50% 50% 50%;
+                animation: border-animation 3s infinite linear;
+            }
+
+            /* Animation */
+            @keyframes border-animation 
+            {
+                to { transform: rotate(360deg); }
+            }
+        </style>
+
+    </head>
+
+    <body>
+        <span class="body">
+            <h1>Welcome!</h1>
+            <h3>What is your name?</h3>
+            <form>
+                <input type="text" name="name">
+                <br>
+                <p style="left: 47%;"><input type="submit" class="ok"></p>
+            </form>
+        </span>
+
+        <div class="circle-1"></div>
+        <div class="circle-2"></div>
+        <div class="circle-3"></div>
+    
+    </body>
+</html>
